@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manyo Hotel Digital Lobby</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Config for Custom Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        jungle: '#2F855A', // Brand Color
+                        plumeria: '#F6E05E', // Brand Color
+                        wood: '#F5F5F4', // Brand Color
+                        'wood-dark': '#E2E8F0',
+                    },
+                    fontFamily: {
+                        serif: ['Georgia', 'serif'],
+                        sans: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+                        rounded: ['ui-rounded', 'system-ui', 'sans-serif'], // For the cute feel
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Animations */
+        @keyframes spin-animation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .shake-element {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Flower Animations */
+        .flower-idle {
+            animation: rotate-flower 20s linear infinite;
+        }
+        
+        .flower-spin {
+            animation: rotate-flower 0.6s linear infinite;
+        }
+
+        @keyframes rotate-flower {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pop-in {
+            animation: pop-reveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes pop-reveal {
+            0% { transform: scale(0) rotate(-90deg); opacity: 0; }
+            80% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .pulse-glow {
+            animation: pulse-gold 1.5s infinite;
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(246, 224, 94, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(246, 224, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(246, 224, 94, 0); }
+        }
+
+        /* Hide Scrollbar */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        
+        .blind-active {
+            opacity: 0 !important;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Pour Game Animation */
+        .liquid-fill {
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 20%), #F6E05E;
+            box-shadow: 0 0 10px rgba(246, 224, 94, 0.5);
+        }
+        .foam-head {
+            background: #FFFFFF;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .bubble-rise {
+            position: absolute;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            animation: bubbling 2s infinite ease-in;
+        }
+        @keyframes bubbling {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-150px) scale(1.2); opacity: 0; }
+        }
+
+        /* Ticket Shine Effect */
+        .ticket-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .ticket-shine::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.3) 50%,
+                rgba(255,255,255,0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            20% { transform: translateX(100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+
+        /* === NEW: IMMERSIVE RACE EFFECTS === */
+        
+        /* Stage Background Transitions */
+        .bg-transition {
+            transition: background-image 1.5s ease-in-out, background-color 1.5s ease-in-out;
+        }
+
+        /* Stage A: Clouds */
+        @keyframes float-cloud {
+            0% { transform: translateX(100%); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateX(-150%); opacity: 0; }
+        }
+        .env-cloud {
+            position: absolute;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50px;
+            filter: blur(8px);
+            z-index: 1;
+            animation: float-cloud 8s linear infinite;
+        }
+
+        /* Stage B: Bubbles */
+        @keyframes rise-bubble-env {
+            0% { transform: translateY(100%) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            100% { transform: translateY(-20%) scale(1.2); opacity: 0; }
+        }
+        .env-bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.8);
+            z-index: 10;
+            animation: rise-bubble-env 3s linear infinite;
+        }
+
+        /* Stage C: Speed Lines */
+        @keyframes speed-line-dash {
+            0% { transform: translateX(100%) scaleX(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(-200%) scaleX(2); opacity: 0; }
+        }
+        .env-speed-line {
+            position: absolute;
+            height: 2px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 2px;
+            z-index: 1;
+            box-shadow: 0 0 4px white;
+            animation: speed-line-dash 0.6s linear infinite;
+        }
+
+        /* Elephant Poses */
+        @keyframes waddle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        @keyframes struggle { 
+            0%, 100% { transform: translateY(0) rotate(-12deg); }
+            50% { transform: translateY(2px) rotate(-15deg); } 
+        }
+        @keyframes sprint {
+            0%, 100% { transform: translateY(0) rotate(12deg) scale(1.1); }
+            25% { transform: translateY(-1px) rotate(14deg) scale(1.1); }
+            75% { transform: translateY(1px) rotate(10deg) scale(1.1); }
+        }
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-5%); }
+            50% { transform: translateY(5%); }
+        }
+
+        .pose-normal {
+            animation: waddle 0.4s infinite ease-in-out;
+        }
+        .pose-struggle {
+            animation: struggle 1s infinite ease-in-out; /* Slow and heavy */
+        }
+        .pose-sprint {
+            animation: sprint 0.1s infinite linear; /* Fast and jittery */
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 2s infinite ease-in-out;
+        }
+        
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd300;
+            top: -10px;
+            z-index: 50;
+        }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@^19.2.3",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react/": "https://esm.sh/react@^19.2.3/"
+      }
+    }
+    </script>
+</head>
+<body class="bg-wood min-h-screen text-stone-800 font-sans select-none overflow-x-hidden pb-20">
+
+    <div id="app" class="relative max-w-md mx-auto min-h-screen bg-wood shadow-2xl">
+        
+        <!-- === HEADER === -->
+        <header class="sticky top-0 z-50 bg-jungle text-plumeria px-4 py-3 flex justify-between items-center shadow-md">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-hotel"></i>
+                <h1 class="font-serif text-lg font-bold tracking-wide">Manyo Hotel</h1>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="AudioEngine.toggleMute()" class="text-plumeria hover:text-white transition" title="Toggle Sound">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-xl"></i>
+                </button>
+                <button class="text-plumeria hover:text-white transition">
+                    <i class="fa-solid fa-globe text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- === LOBBY SECTION === -->
+        <section id="lobby-section" class="p-4 space-y-6 animate-fade-in">
+            <!-- Welcome -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-wood-dark">
+                <p class="text-sm text-stone-500 mb-1">Guest Area</p>
+                <h2 class="text-2xl font-serif text-jungle font-bold">Sabaidee, Table 05 🌸</h2>
+                <p class="text-stone-600 mt-2 text-sm">Welcome to Manyo Hotel. Enjoy our digital amenities.</p>
+            </div>
+
+            <!-- Games Grid -->
+            <div class="space-y-4">
+                <h3 class="text-jungle font-bold border-l-4 border-plumeria pl-3">Entertainment</h3>
+                
+                <!-- Game 1: Wheel -->
+                <div onclick="navigateTo('wheel-section')" class="bg-white rounded-2xl shadow-md overflow-hidden active:scale-95 transition-transform cursor-pointer border border-stone-100">
+                    <!-- Banner Area -->
+                    <div class="h-28 bg-stone-50 relative flex items-center justify-center overflow-hidden">
+                        <!-- Abstract Pattern -->
+                        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#2F855A 1px, transparent 1px); background-size: 10px 10px;"></div>
+                        
+                        <!-- Wheel Icon -->
+                        <div class="relative w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden" 
+                            style="background: conic-gradient(#F6E05E 0deg 90deg, #2F855A 90deg 180deg, #F6E05E 180deg 270deg, #2F855A 270deg 360deg); transform: rotate(45deg);">
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full"></div>
+                        </div>
+                        <!-- Pointer -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[44px] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[10px] border-t-red-500 z-10 drop-shadow-sm"></div>
+                    </div>
+                    
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-lg text-jungle">Plumeria Wish</h4>
+                            <p class="text-xs text-stone-500">Make a wish for free beer & snacks!</p>
+                        </div>
+                        <div class="bg-jungle text-plumeria w-10 h-10 rounded-full flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 2: Pour -->
+                <div onclick="navigateTo('pour-section')" class="bg-white rounded-2xl shadow-md overflow-hidden active:scale-95 transition-transform cursor-pointer border border-stone-100">
+                    <div class="h-28 bg-[#FEFCBF] relative flex items-center justify-center overflow-hidden">
+                         <!-- Beer Icon -->
+                         <div class="relative w-12 h-16 mr-2">
+                             <!-- Handle -->
+                             <div class="absolute right-[-8px] top-3 w-8 h-8 border-[5px] border-[#F6E05E] rounded-full"></div>
+                             <!-- Mug Body -->
+                             <div class="relative w-full h-full bg-[#F6E05E] rounded-lg border-2 border-white/20 overflow-hidden z-10 shadow-sm flex items-end justify-center">
+                                 <!-- Glare -->
+                                 <div class="absolute top-2 left-2 w-1 h-8 bg-white/30 rounded-full"></div>
+                                 <!-- Bubbles -->
+                                 <div class="mb-3 w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style="animation-duration: 2s;"></div>
+                                 <div class="mb-5 ml-2 w-1 h-1 bg-white/40 rounded-full animate-bounce" style="animation-duration: 3s;"></div>
+                             </div>
+                             <!-- Foam -->
+                             <div class="absolute -top-2 -left-1 w-[120%] h-5 bg-white rounded-full grid grid-cols-3 gap-0.5 z-20">
+                                 <div class="bg-white rounded-full w-full h-full"></div>
+                                 <div class="bg-white rounded-full w-full h-full -mt-1"></div>
+                                 <div class="bg-white rounded-full w-full h-full"></div>
+                             </div>
+                         </div>
+                    </div>
+                    
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-lg text-jungle">9.00s Challenge</h4>
+                            <p class="text-xs text-stone-500">Stop exactly at 9.00s for a free meal.</p>
+                        </div>
+                        <div class="bg-jungle text-plumeria w-10 h-10 rounded-full flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-stopwatch"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 3: Race -->
+                <div onclick="navigateTo('shake-section')" class="bg-white rounded-2xl shadow-md overflow-hidden active:scale-95 transition-transform cursor-pointer border border-stone-100">
+                    <div class="h-28 bg-[#F0FFF4] relative flex items-center justify-center overflow-hidden">
+                         <!-- Elephant Icon -->
+                         <div class="w-20 h-20 bg-jungle rounded-full relative flex items-center justify-center shadow-md border-4 border-white">
+                             <!-- Ears -->
+                             <div class="absolute top-1 -left-2 w-8 h-8 bg-[#225c40] rounded-full -z-10"></div>
+                             <div class="absolute top-1 -right-2 w-8 h-8 bg-[#225c40] rounded-full -z-10"></div>
+                             <!-- Eyes -->
+                             <div class="absolute top-7 left-5 w-2 h-2 bg-white rounded-full"></div>
+                             <div class="absolute top-7 right-5 w-2 h-2 bg-white rounded-full"></div>
+                             <!-- Trunk -->
+                             <div class="absolute top-10 w-4 h-6 bg-jungle rounded-b-full border-b-4 border-black/10"></div>
+                             <!-- Blush -->
+                             <div class="absolute top-9 left-3 w-3 h-1.5 bg-pink-300/30 rounded-full blur-[1px]"></div>
+                             <div class="absolute top-9 right-3 w-3 h-1.5 bg-pink-300/30 rounded-full blur-[1px]"></div>
+                         </div>
+                    </div>
+                    
+                    <div class="p-4 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-lg text-jungle">Elephant Race</h4>
+                            <p class="text-xs text-stone-500">Pick a racer & win Family Set!</p>
+                        </div>
+                        <div class="bg-jungle text-plumeria w-10 h-10 rounded-full flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-flag-checkered"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- === GAME 1: PLUMERIA WISH SECTION === -->
+        <section id="wheel-section" class="hidden min-h-screen bg-wood flex flex-col">
+            <div class="p-4 flex flex-col h-full">
+                <button onclick="navigateTo('lobby-section')" class="text-stone-500 hover:text-jungle flex items-center gap-2 mb-4">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Lobby
+                </button>
+                <h2 class="text-2xl font-serif text-center text-jungle font-bold mb-1">Make a Wish</h2>
+                <p class="text-center text-stone-500 text-sm mb-4">Tap the flower heart to see your fortune.</p>
+
+                <!-- Flower Container -->
+                <div class="relative w-80 h-80 mx-auto flex items-center justify-center">
+                    <div class="absolute w-72 h-72 bg-jungle rounded-full shadow-xl flex items-center justify-center"></div>
+                    <svg id="plumeria-flower" class="w-80 h-80 flower-idle absolute z-10 drop-shadow-lg transition-transform" viewBox="0 0 400 400" onclick="spinWheel()">
+                        <defs>
+                            <radialGradient id="petalGrad" cx="0.5" cy="0.5" r="0.7" fx="0.5" fy="0.5">
+                                <stop offset="10%" stop-color="#F6E05E" />
+                                <stop offset="40%" stop-color="#FEFCBF" />
+                                <stop offset="90%" stop-color="#FFFFFF" />
+                            </radialGradient>
+                            <filter id="petalShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+                            </filter>
+                        </defs>
+                        <g transform="translate(200,200)">
+                            <path d="M0,0 Q50,-80 20,-150 Q0,-170 -20,-150 Q-50,-80 0,0" fill="url(#petalGrad)" filter="url(#petalShadow)" transform="rotate(0)" />
+                            <path d="M0,0 Q50,-80 20,-150 Q0,-170 -20,-150 Q-50,-80 0,0" fill="url(#petalGrad)" filter="url(#petalShadow)" transform="rotate(72)" />
+                            <path d="M0,0 Q50,-80 20,-150 Q0,-170 -20,-150 Q-50,-80 0,0" fill="url(#petalGrad)" filter="url(#petalShadow)" transform="rotate(144)" />
+                            <path d="M0,0 Q50,-80 20,-150 Q0,-170 -20,-150 Q-50,-80 0,0" fill="url(#petalGrad)" filter="url(#petalShadow)" transform="rotate(216)" />
+                            <path d="M0,0 Q50,-80 20,-150 Q0,-170 -20,-150 Q-50,-80 0,0" fill="url(#petalGrad)" filter="url(#petalShadow)" transform="rotate(288)" />
+                        </g>
+                    </svg>
+                    <div id="flower-center-btn" onclick="spinWheel()" class="relative z-20 w-24 h-24 bg-white/90 backdrop-blur-sm rounded-full shadow-inner border-4 border-plumeria flex items-center justify-center cursor-pointer active:scale-95 transition-transform group">
+                        <div id="flower-idle-content" class="text-center flex flex-col items-center animate-pulse">
+                            <span class="font-serif font-bold text-jungle text-xl tracking-wider">WISH</span>
+                            <i class="fa-solid fa-wand-magic-sparkles text-plumeria text-xs mt-1"></i>
+                        </div>
+                        <div id="flower-result-content" class="hidden absolute inset-0 flex items-center justify-center bg-white rounded-full border-4 border-jungle overflow-hidden">
+                             <i id="prize-icon-display" class="text-4xl text-jungle"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center px-6">
+                     <p id="spin-msg" class="text-stone-400 text-sm h-6 font-medium">May luck be with you...</p>
+                </div>
+
+                <!-- Ticket Display -->
+                <div id="ticket-display" class="mt-12 w-11/12 max-w-sm mx-auto bg-white rounded-2xl shadow-xl overflow-hidden relative ticket-shine transition-all duration-500">
+                    <div class="h-3 bg-jungle w-full"></div>
+                    <div class="p-6 relative flex flex-col items-center justify-center text-center min-h-[180px]">
+                        <i class="fa-solid fa-ticket absolute -right-6 -bottom-6 text-9xl text-stone-100 opacity-30 rotate-12"></i>
+                        <div id="ticket-content-wrapper" class="relative z-10 space-y-2 w-full">
+                            <p id="ticket-subtitle" class="text-xs font-bold text-stone-400 uppercase tracking-[0.2em]">Top Prize</p>
+                            <h3 id="ticket-title" class="text-4xl font-serif font-bold text-jungle leading-tight">$100</h3>
+                            <div class="w-12 h-1 bg-plumeria mx-auto rounded-full my-3"></div>
+                            <p id="ticket-desc" class="text-lg font-bold text-stone-700">Cash Voucher</p>
+                            <p id="ticket-footer" class="text-xs text-stone-400 mt-1">Redeemable at Reception</p>
+                        </div>
+                    </div>
+                    <div class="absolute top-1/2 left-0 w-5 h-10 bg-wood -translate-x-2.5 -translate-y-1/2 rounded-full shadow-inner"></div>
+                    <div class="absolute top-1/2 right-0 w-5 h-10 bg-wood translate-x-2.5 -translate-y-1/2 rounded-full shadow-inner"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- === GAME 2: POUR SECTION === -->
+        <section id="pour-section" class="hidden min-h-screen bg-wood flex flex-col">
+            <div class="p-4 h-full flex flex-col">
+                <button onclick="navigateTo('lobby-section')" class="text-stone-500 hover:text-jungle flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+                <div class="flex-1 flex flex-col items-center justify-center space-y-6">
+                    <h2 class="text-xl font-bold text-jungle">Perfect Pour Challenge</h2>
+                    <div class="relative w-64 h-64 bg-white/40 rounded-full flex items-center justify-center shadow-2xl border-4 border-white overflow-hidden ring-4 ring-stone-100 isolate">
+                        <div id="pour-liquid" class="liquid-fill absolute bottom-0 left-0 w-full h-0 transition-all duration-75 ease-linear z-0"></div>
+                        <div id="pour-foam" class="foam-head absolute left-0 w-full h-4 transition-all duration-75 ease-linear z-0 opacity-0" style="bottom: 0;"></div>
+                        <div id="pour-bubbles" class="absolute inset-0 z-0 pointer-events-none"></div>
+                        <div class="relative z-10 text-center mix-blend-multiply">
+                            <div id="pour-timer" class="text-6xl font-mono font-bold text-stone-800 transition-opacity duration-300">0.00</div>
+                            <div class="text-xs text-stone-600 font-bold mt-1 bg-white/50 px-2 rounded">Target: 9.00s</div>
+                        </div>
+                    </div>
+                    <button id="pour-btn" class="w-48 h-48 rounded-full bg-jungle text-plumeria text-2xl font-bold shadow-2xl active:scale-95 transition-all border-4 border-plumeria flex flex-col items-center justify-center gap-2">
+                        <i class="fa-solid fa-beer-mug-empty text-4xl"></i>
+                        <span id="pour-btn-text">START</span>
+                    </button>
+                    <!-- Pour Prize Card -->
+                    <div id="pour-ticket-display" class="mt-8 w-full max-w-sm mx-auto bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-300 rounded-2xl shadow-[0_0_25px_rgba(234,179,8,0.6)] border-4 border-yellow-500 p-6 relative animate-pulse flex flex-col items-center justify-center text-center">
+                        <div id="pour-ticket-content-wrapper" class="relative z-10 w-full">
+                            <p id="pour-ticket-subtitle" class="text-red-600 font-bold tracking-widest text-sm uppercase mb-2">🎯 TARGET: 9.00s</p>
+                            <h3 id="pour-ticket-title" class="text-5xl font-black text-green-900 drop-shadow-sm mb-1">FREE MEAL</h3>
+                            <p id="pour-ticket-desc" class="hidden">Stop exactly at 9.00s - 9.05s</p> 
+                            <div class="text-green-800 font-semibold text-xs mt-3 border-t border-yellow-500/50 pt-2">
+                                🥈 Close call (8.90-9.10s): 30% OFF
+                            </div>
+                            <div id="pour-practice-display" class="mt-2 inline-block px-3 py-1 bg-yellow-500/20 rounded-full text-xs font-bold text-green-900 border border-yellow-600/30">
+                                Practice Left: 3
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- === GAME 3: ELEPHANT RACE (IMMERSIVE REFACTOR) === -->
+        <section id="shake-section" class="hidden min-h-screen bg-wood flex flex-col">
+            <div class="p-4 h-full flex flex-col relative overflow-hidden">
+                <button onclick="navigateTo('lobby-section')" class="text-stone-500 hover:text-jungle flex items-center gap-2 mb-4 z-20">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+
+                <!-- Confetti Container -->
+                <div id="confetti-container" class="absolute inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+                <!-- STAGE A: SELECTION -->
+                <div id="race-selection" class="flex-1 flex flex-col items-center justify-center animate-fade-in">
+                    <h2 class="text-3xl font-rounded font-bold text-jungle mb-2 text-center">Who will win?</h2>
+                    <p class="text-stone-500 text-sm mb-8 text-center bg-white/50 px-4 py-1 rounded-full">Pick your lucky runner!</p>
+                    
+                    <div class="grid grid-cols-2 gap-6 w-full max-w-sm">
+                        <!-- Red Elephant -->
+                        <div onclick="selectElephant('red')" class="aspect-square bg-rose-100 rounded-2xl border-4 border-rose-200 flex flex-col items-center justify-center cursor-pointer shadow-lg active:scale-95 transition-all hover:-translate-y-1">
+                            <div class="scale-125 mb-2" id="preview-red"></div>
+                            <span class="text-rose-500 font-bold text-sm">Rosie</span>
+                        </div>
+                        <!-- Blue Elephant -->
+                        <div onclick="selectElephant('blue')" class="aspect-square bg-sky-100 rounded-2xl border-4 border-sky-200 flex flex-col items-center justify-center cursor-pointer shadow-lg active:scale-95 transition-all hover:-translate-y-1">
+                            <div class="scale-125 mb-2" id="preview-blue"></div>
+                            <span class="text-sky-500 font-bold text-sm">Sky</span>
+                        </div>
+                        <!-- Yellow Elephant -->
+                        <div onclick="selectElephant('yellow')" class="aspect-square bg-amber-100 rounded-2xl border-4 border-amber-200 flex flex-col items-center justify-center cursor-pointer shadow-lg active:scale-95 transition-all hover:-translate-y-1">
+                            <div class="scale-125 mb-2" id="preview-yellow"></div>
+                            <span class="text-amber-500 font-bold text-sm">Sunny</span>
+                        </div>
+                        <!-- Green Elephant -->
+                        <div onclick="selectElephant('green')" class="aspect-square bg-emerald-100 rounded-2xl border-4 border-emerald-200 flex flex-col items-center justify-center cursor-pointer shadow-lg active:scale-95 transition-all hover:-translate-y-1">
+                            <div class="scale-125 mb-2" id="preview-green"></div>
+                            <span class="text-emerald-500 font-bold text-sm">Leafy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STAGE B: IMMERSIVE RACE TRACK -->
+                <div id="race-track" class="hidden flex-1 flex flex-col justify-center w-full relative">
+                    
+                    <!-- Progress Map -->
+                    <div class="flex justify-between items-center mb-4 px-2">
+                        <div id="icon-meadow" class="text-stone-300 transition-colors duration-500 text-xl"><i class="fa-solid fa-sun"></i></div>
+                        <div class="flex-1 h-1 bg-stone-200 mx-2 rounded-full overflow-hidden">
+                            <div id="progress-fill" class="h-full bg-jungle w-0 transition-all duration-300"></div>
+                        </div>
+                        <div id="icon-river" class="text-stone-300 transition-colors duration-500 text-xl"><i class="fa-solid fa-water"></i></div>
+                        <div class="flex-1 h-1 bg-stone-200 mx-2 rounded-full overflow-hidden">
+                            <div id="progress-fill-2" class="h-full bg-blue-500 w-0 transition-all duration-300"></div>
+                        </div>
+                        <div id="icon-sunset" class="text-stone-300 transition-colors duration-500 text-xl"><i class="fa-solid fa-fire"></i></div>
+                    </div>
+
+                    <!-- TV Container -->
+                    <div class="relative rounded-3xl overflow-hidden shadow-2xl border-[6px] border-stone-800 bg-stone-800">
+                        
+                        <!-- Dynamic Background -->
+                        <div id="race-track-bg" class="bg-transition relative h-80 flex flex-col bg-gradient-to-b from-sky-300 to-green-300 overflow-hidden">
+                            
+                            <!-- Environmental Layers -->
+                            <div id="layer-clouds" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000"></div>
+                            <div id="layer-bubbles" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000"></div>
+                            <div id="layer-lines" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000"></div>
+
+                            <!-- Finish Line -->
+                            <div class="absolute right-8 top-0 bottom-0 w-8 z-0 opacity-40 flex flex-col">
+                                <div class="h-4 bg-white/50"></div><div class="h-4 bg-transparent"></div>
+                                <div class="h-4 bg-white/50"></div><div class="h-4 bg-transparent"></div>
+                                <div class="h-4 bg-white/50"></div><div class="h-4 bg-transparent"></div>
+                                <div class="h-4 bg-white/50"></div><div class="h-4 bg-transparent"></div>
+                                <div class="h-4 bg-white/50"></div><div class="h-4 bg-transparent"></div>
+                                <div class="h-4 bg-white/50"></div><div class="h-4 bg-transparent"></div>
+                                <div class="h-4 bg-white/50"></div><div class="h-4 bg-transparent"></div>
+                            </div>
+
+                            <!-- Tracks -->
+                            <div class="flex-1 border-b border-black/5 relative z-10"><div id="racer-red" class="absolute left-0 bottom-1 w-16 h-16"></div></div>
+                            <div class="flex-1 border-b border-black/5 relative z-10"><div id="racer-blue" class="absolute left-0 bottom-1 w-16 h-16"></div></div>
+                            <div class="flex-1 border-b border-black/5 relative z-10"><div id="racer-yellow" class="absolute left-0 bottom-1 w-16 h-16"></div></div>
+                            <div class="flex-1 relative z-10"><div id="racer-green" class="absolute left-0 bottom-1 w-16 h-16"></div></div>
+                        </div>
+
+                        <!-- TV Overlay Scanlines (Optional Visual Polish) -->
+                        <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] z-20 bg-[length:100%_4px,6px_100%]"></div>
+                    </div>
+                    
+                    <div class="text-center mt-3 h-6">
+                        <p id="race-subtext" class="font-bold text-stone-400 font-mono tracking-widest text-sm transition-all duration-300">LIVE BROADCAST</p>
+                    </div>
+                </div>
+
+                <!-- STAGE C: RESULT OVERLAY -->
+                <div id="race-result" class="hidden absolute inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+                    <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl border-4 border-white ring-4 ring-plumeria transform scale-100 transition-all">
+                        
+                        <!-- Header Icon -->
+                        <div id="result-icon-bg" class="w-20 h-20 mx-auto rounded-full flex items-center justify-center -mt-16 mb-4 shadow-lg border-4 border-white">
+                            <i id="result-icon" class="text-4xl text-white fa-solid"></i>
+                        </div>
+
+                        <h2 id="result-title" class="text-3xl font-black text-jungle mb-2 uppercase">Title</h2>
+
+                        <!-- New Winner Visual Display -->
+                        <div id="winner-visual" class="hidden mb-4">
+                            <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-b from-yellow-300 to-yellow-500 border-4 border-yellow-200 shadow-[0_0_15px_rgba(234,179,8,0.6)] flex items-center justify-center relative">
+                                <div id="winner-svg-target" class="w-20 h-20 animate-bounce-slow pt-2"></div>
+                            </div>
+                        </div>
+
+                        <p id="result-msg" class="text-sm text-stone-600 font-medium mb-6">Message</p>
+
+                        <!-- Prize Box -->
+                        <div class="bg-stone-100 rounded-xl p-4 mb-6 border-2 border-dashed border-stone-300">
+                            <p class="text-xs uppercase font-bold text-stone-400 mb-1">Your Prize</p>
+                            <div class="flex items-center justify-center gap-3">
+                                <i id="prize-icon" class="text-2xl text-jungle fa-solid"></i>
+                                <span id="prize-name" class="text-xl font-bold text-stone-800">Prize Name</span>
+                            </div>
+                        </div>
+
+                        <button onclick="initElephantGame()" class="w-full bg-jungle text-plumeria font-bold text-lg py-3 rounded-full shadow-lg active:scale-95 transition hover:brightness-110">
+                            Play Again
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- === WALLET SECTION === -->
+        <section id="wallet-section" class="hidden p-4 pb-24 min-h-screen bg-wood">
+            <h2 class="text-2xl font-serif text-jungle font-bold mb-6">My Rewards</h2>
+            
+            <div id="wallet-list" class="space-y-4">
+                <!-- Items injected via JS -->
+            </div>
+            
+            <div id="wallet-empty" class="hidden flex flex-col items-center justify-center mt-20 text-stone-400">
+                <i class="fa-solid fa-gift text-6xl mb-4"></i>
+                <p>No rewards yet. Play some games!</p>
+                <button onclick="navigateTo('lobby-section')" class="mt-6 text-jungle font-bold underline">Go to Lobby</button>
+            </div>
+        </section>
+
+        <!-- === BOTTOM NAVIGATION === -->
+        <nav class="fixed bottom-0 w-full bg-white border-t border-stone-200 flex justify-around py-2 pb-4 z-40 max-w-md mx-auto">
+            <button onclick="navigateTo('lobby-section')" id="nav-lobby" class="flex flex-col items-center text-jungle w-1/2 group">
+                <div class="bg-stone-100 rounded-full w-12 h-8 flex items-center justify-center group-hover:bg-green-100 transition mb-1">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span class="text-xs font-bold">Lobby</span>
+            </button>
+            <button onclick="navigateTo('wallet-section')" id="nav-wallet" class="flex flex-col items-center text-stone-400 w-1/2 group hover:text-jungle transition">
+                <div class="bg-transparent rounded-full w-12 h-8 flex items-center justify-center group-hover:bg-green-100 transition mb-1">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span class="text-xs font-bold">Wallet</span>
+            </button>
+        </nav>
+
+        <!-- === CONGRATS MODAL === -->
+        <div id="modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center transform transition-all scale-100">
+                <div class="w-16 h-16 bg-plumeria text-jungle rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-lg">
+                    <i id="modal-icon" class="fa-solid fa-gift"></i>
+                </div>
+                <h3 id="modal-title" class="text-xl font-bold text-jungle mb-2">Congratulations!</h3>
+                <p id="modal-desc" class="text-stone-600 mb-6">You won a Free Beer coupon.</p>
+                <button onclick="closeModal()" class="w-full bg-jungle text-plumeria font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">
+                    Awesome!
+                </button>
+            </div>
+        </div>
+
+        <!-- === CLAIM PRIZE FORM MODAL === -->
+        <div id="claim-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 relative">
+                
+                <!-- New Prize Display Section -->
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-jungle text-plumeria rounded-full flex items-center justify-center mx-auto mb-3 shadow-md border-4 border-white ring-2 ring-jungle/20">
+                        <i id="claim-prize-icon" class="fa-solid fa-gift text-2xl"></i>
+                    </div>
+                    <div class="bg-stone-50 rounded-lg p-2 border border-stone-100 mx-4">
+                        <h3 class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">You Won</h3>
+                        <div id="claim-prize-name" class="text-xl font-black text-jungle leading-tight">Prize Name</div>
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <h3 class="text-xl font-black text-stone-800 uppercase leading-tight">HUGE WIN!<br>CLAIM YOUR PRIZE</h3>
+                    <p class="text-stone-500 text-xs mt-1">Register to secure your reward.</p>
+                </div>
+                
+                <form onsubmit="submitClaimForm(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase mb-1 tracking-wider">Name (Optional)</label>
+                        <input type="text" id="claim-name" class="w-full border border-stone-300 rounded-lg p-3 text-sm focus:border-jungle focus:ring-1 focus:ring-jungle focus:outline-none transition-colors" placeholder="Mr. Lucky">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase mb-1 tracking-wider">Phone Number <span class="text-red-500">*</span></label>
+                        <input type="tel" id="claim-phone" required class="w-full border border-stone-300 rounded-lg p-3 text-lg font-mono tracking-widest focus:border-jungle focus:ring-1 focus:ring-jungle focus:outline-none transition-colors" placeholder="020-XXXX-XXXX">
+                    </div>
+                    
+                    <button type="submit" id="claim-submit-btn" class="w-full bg-jungle hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2 mt-2">
+                        <span>Secure My Prize</span>
+                        <i class="fa-solid fa-lock text-sm"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- === ITEM DETAILS MODAL === -->
+        <div id="details-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm relative">
+                <button onclick="document.getElementById('details-modal').classList.add('hidden')" class="absolute top-4 right-4 text-stone-400 hover:text-stone-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <h3 class="text-lg font-bold text-jungle mb-4 border-b border-stone-100 pb-2">Reward Details</h3>
+                
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-xs font-bold text-stone-400 uppercase block">Prize</span>
+                        <span id="detail-prize" class="text-lg font-bold text-stone-800">Prize Name</span>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-stone-400 uppercase block">Winner Name</span>
+                        <span id="detail-name" class="font-mono text-stone-600">Name</span>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-stone-400 uppercase block">Phone Number</span>
+                        <span id="detail-phone" class="font-mono text-stone-600">Phone</span>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-stone-400 uppercase block">Win Time</span>
+                        <span id="detail-time" class="text-sm text-stone-500">Time</span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-stone-100 text-center">
+                     <span class="inline-block bg-jungle/10 text-jungle text-xs font-bold px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-check-circle mr-1"></i> Verified Registration
+                     </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- === JAVASCRIPT LOGIC === -->
+    <script>
+        // --- AUDIO ENGINE ---
+        const AudioEngine = {
+            ctx: null,
+            muted: false,
+            bgNodes: {}, // Store noise nodes
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended' && !this.muted) {
+                    this.ctx.resume();
+                }
+            },
+
+            toggleMute() {
+                this.muted = !this.muted;
+                const icon = document.getElementById('sound-icon');
+                if (this.muted) {
+                    if (this.ctx) this.ctx.suspend();
+                    if(icon) icon.className = "fa-solid fa-volume-xmark text-xl";
+                } else {
+                    if (this.ctx) this.ctx.resume();
+                    if(icon) icon.className = "fa-solid fa-volume-high text-xl";
+                    this.playClick(); // Feedback
+                }
+            },
+
+            playTone(freq, type, duration, vol = 0.1, delay = 0) {
+                if (this.muted) return;
+                this.init();
+                const t = this.ctx.currentTime + delay;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, t);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(t);
+                gain.gain.setValueAtTime(vol, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+                osc.stop(t + duration);
+            },
+
+            playClick() {
+                // High pitch short blip
+                this.playTone(800, 'sine', 0.1, 0.05);
+            },
+            
+            playTick() {
+                // Wood block sound
+                this.playTone(300, 'square', 0.05, 0.05);
+            },
+
+            playWin() {
+                // Major arpeggio
+                this.playTone(523.25, 'triangle', 0.4, 0.1, 0); // C5
+                this.playTone(659.25, 'triangle', 0.4, 0.1, 0.15); // E5
+                this.playTone(783.99, 'triangle', 0.4, 0.1, 0.3); // G5
+                this.playTone(1046.50, 'square', 0.8, 0.1, 0.45); // C6
+            },
+
+            playLose() {
+                // Descending tritone/sad
+                this.playTone(392.00, 'sawtooth', 0.4, 0.1, 0); // G4
+                this.playTone(369.99, 'sawtooth', 0.4, 0.1, 0.2); // F#4
+                this.playTone(349.23, 'sawtooth', 0.8, 0.1, 0.4); // F4
+            },
+
+            // --- AMBIENT NOISE GENERATOR ---
+            createNoise(type = 'white') {
+                const bufferSize = this.ctx.sampleRate * 2; 
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                return buffer;
+            },
+
+            startPourSound() {
+                if (this.muted || this.bgNodes.pour) return;
+                this.init();
+                
+                const src = this.ctx.createBufferSource();
+                src.buffer = this.createNoise();
+                src.loop = true;
+                
+                // Lowpass for liquid
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 400;
+
+                const gain = this.ctx.createGain();
+                gain.gain.value = 0.15;
+
+                src.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                src.start();
+                
+                this.bgNodes.pour = { src, gain, filter };
+            },
+
+            stopPourSound() {
+                if (this.bgNodes.pour) {
+                    this.bgNodes.pour.src.stop();
+                    this.bgNodes.pour = null;
+                }
+            },
+
+            startRaceAmbience() {
+                if (this.muted || this.bgNodes.race) return;
+                this.init();
+                
+                const src = this.ctx.createBufferSource();
+                src.buffer = this.createNoise();
+                src.loop = true;
+                
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 200;
+
+                const gain = this.ctx.createGain();
+                gain.gain.value = 0.05;
+
+                src.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                src.start();
+
+                this.bgNodes.race = { src, gain, filter };
+            },
+
+            updateRaceAmbience(intensity) { // 0 to 1
+                if (this.bgNodes.race) {
+                    const freq = 200 + (intensity * 800);
+                    const vol = 0.05 + (intensity * 0.1);
+                    this.bgNodes.race.filter.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.2);
+                    this.bgNodes.race.gain.gain.setTargetAtTime(vol, this.ctx.currentTime, 0.2);
+                }
+            },
+
+            stopRaceAmbience() {
+                if (this.bgNodes.race) {
+                    this.bgNodes.race.src.stop();
+                    this.bgNodes.race = null;
+                }
+            }
+        };
+
+        // Hook for global clicks
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('button, .cursor-pointer');
+            if (btn && !btn.title.includes('Toggle Sound')) { 
+                 AudioEngine.playClick();
+            }
+        });
+
+        // --- DATA LAYER ---
+        const DB = {
+            getWallet: () => JSON.parse(localStorage.getItem('manyo_wallet') || '[]'),
+            addToWallet: (item) => {
+                const wallet = DB.getWallet();
+                // Add ID
+                item.id = Date.now().toString();
+                item.redeemed = false;
+                wallet.unshift(item);
+                localStorage.setItem('manyo_wallet', JSON.stringify(wallet));
+            },
+            getPourPractice: () => parseInt(localStorage.getItem('manyo_pour_practice') || '3'),
+            decPourPractice: () => {
+                let count = DB.getPourPractice();
+                if (count > 0) count--;
+                localStorage.setItem('manyo_pour_practice', count.toString());
+                return count;
+            },
+            getLastSpin: () => localStorage.getItem('manyo_last_spin'),
+            setLastSpin: () => localStorage.setItem('manyo_last_spin', new Date().toISOString())
+        };
+
+        // --- CLOUD SYNC & CLAIM LOGIC ---
+        
+        let pendingWinData = null; // Store data while form is open
+
+        function openClaimForm(data) {
+            pendingWinData = data;
+            document.getElementById('claim-modal').classList.remove('hidden');
+            
+            // Populate Prize Info
+            const prizeNameEl = document.getElementById('claim-prize-name');
+            const prizeIconEl = document.getElementById('claim-prize-icon');
+            
+            if (prizeNameEl) prizeNameEl.innerText = data.prizeTitle;
+            if (prizeIconEl) prizeIconEl.className = `fa-solid ${data.prizeIcon} text-2xl`;
+
+            // Reset form
+            document.getElementById('claim-name').value = '';
+            document.getElementById('claim-phone').value = '';
+            // Robustly reset button to initial state with icon
+            document.getElementById('claim-submit-btn').innerHTML = `<span>Secure My Prize</span><i class="fa-solid fa-lock text-sm"></i>`;
+            document.getElementById('claim-submit-btn').disabled = false;
+        }
+
+        async function saveToCloud(formData) {
+            // GOOGLE FORM CONFIGURATION (Placeholders)
+            const FORM_URL = "YOUR_GOOGLE_FORM_ACTION_URL"; // e.g., https://docs.google.com/forms/d/e/.../formResponse
+            const ENTRY_NAME = "entry.123456";
+            const ENTRY_PHONE = "entry.654321";
+            const ENTRY_PRIZE = "entry.111222";
+            const ENTRY_TABLE = "entry.999888";
+
+            // If URL is placeholder, mock it
+            if (FORM_URL === "YOUR_GOOGLE_FORM_ACTION_URL") {
+                console.log("Mocking Cloud Save:", formData);
+                return new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            const body = new FormData();
+            body.append(ENTRY_NAME, formData.customerName);
+            body.append(ENTRY_PHONE, formData.customerPhone);
+            body.append(ENTRY_PRIZE, formData.prize);
+            body.append(ENTRY_TABLE, formData.tableId);
+
+            try {
+                await fetch(FORM_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Essential for Google Forms
+                    body: body
+                });
+                return true;
+            } catch (e) {
+                console.error("Cloud Save Failed", e);
+                return false; // Fail silently or handle
+            }
+        }
+
+        async function submitClaimForm(e) {
+            e.preventDefault();
+            if (!pendingWinData) return;
+
+            const name = document.getElementById('claim-name').value;
+            const phone = document.getElementById('claim-phone').value;
+            const btn = document.getElementById('claim-submit-btn');
+
+            if (!phone) {
+                alert("Phone number is required!");
+                return;
+            }
+
+            // UI Loading
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Securing...`;
+            btn.disabled = true;
+
+            const record = {
+                prize: pendingWinData.prizeTitle,
+                customerName: name || 'Anonymous',
+                customerPhone: phone,
+                winTime: new Date().toISOString(),
+                tableId: "Table 05" // Hardcoded as requested
+            };
+
+            // 1. Save to Cloud
+            await saveToCloud(record);
+
+            // 2. Save to Local Wallet with Flag
+            DB.addToWallet({
+                title: pendingWinData.prizeTitle,
+                desc: pendingWinData.prizeDesc,
+                icon: pendingWinData.prizeIcon,
+                registered: true, // Flag for badge
+                customerName: record.customerName,
+                customerPhone: record.customerPhone,
+                winTime: new Date().toLocaleString()
+            });
+
+            // 3. Close Form & Show Celebration
+            document.getElementById('claim-modal').classList.add('hidden');
+            
+            // Execute the original visual callback (showModal)
+            if (pendingWinData.onSuccess) {
+                pendingWinData.onSuccess(); 
+            }
+
+            pendingWinData = null;
+        }
+
+        // --- UI NAVIGATION ---
+        function navigateTo(sectionId) {
+            // Hide all sections
+            ['lobby-section', 'wheel-section', 'pour-section', 'shake-section', 'wallet-section'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            // Show target
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            // Reset Game 1 state if leaving
+            if (sectionId !== 'wheel-section') {
+                resetFlower();
+            }
+            // Reset Game 2 state if entering
+            if (sectionId === 'pour-section') {
+                resetPourGameUI();
+            }
+            // Reset Game 3 state if entering
+            if (sectionId === 'shake-section') {
+                initElephantGame();
+            }
+
+            // Update Nav State
+            const navLobby = document.getElementById('nav-lobby');
+            const navWallet = document.getElementById('nav-wallet');
+
+            if (sectionId === 'wallet-section') {
+                navLobby.className = "flex flex-col items-center text-stone-400 w-1/2 group hover:text-jungle transition";
+                navLobby.querySelector('div').className = "bg-transparent rounded-full w-12 h-8 flex items-center justify-center group-hover:bg-green-100 transition mb-1";
+                
+                navWallet.className = "flex flex-col items-center text-jungle w-1/2 group";
+                navWallet.querySelector('div').className = "bg-stone-100 rounded-full w-12 h-8 flex items-center justify-center group-hover:bg-green-100 transition mb-1";
+                
+                renderWallet();
+            } else {
+                navWallet.className = "flex flex-col items-center text-stone-400 w-1/2 group hover:text-jungle transition";
+                navWallet.querySelector('div').className = "bg-transparent rounded-full w-12 h-8 flex items-center justify-center group-hover:bg-green-100 transition mb-1";
+                
+                navLobby.className = "flex flex-col items-center text-jungle w-1/2 group";
+                navLobby.querySelector('div').className = "bg-stone-100 rounded-full w-12 h-8 flex items-center justify-center group-hover:bg-green-100 transition mb-1";
+            }
+        }
+
+        function showModal(title, desc, iconClass = 'fa-gift') {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-icon').className = `fa-solid ${iconClass}`;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            resetFlower(); // Reset flower after closing modal
+        }
+
+        // --- GAME 1: FLOWER (WHEEL) LOGIC ---
+        let isSpinning = false;
+        
+        function updateTicketDisplay(title, main, desc, footer) {
+            document.getElementById('ticket-subtitle').innerText = title;
+            document.getElementById('ticket-title').innerText = main;
+            document.getElementById('ticket-desc').innerText = desc;
+            document.getElementById('ticket-footer').innerText = footer;
+        }
+
+        function resetFlower() {
+            isSpinning = false;
+            const flower = document.getElementById('plumeria-flower');
+            const btn = document.getElementById('flower-center-btn');
+            const idleContent = document.getElementById('flower-idle-content');
+            const resultContent = document.getElementById('flower-result-content');
+            const spinMsg = document.getElementById('spin-msg');
+
+            // Classes
+            flower.classList.remove('flower-spin');
+            flower.classList.add('flower-idle');
+            
+            // Button State
+            btn.classList.remove('pulse-glow');
+            idleContent.classList.remove('hidden');
+            resultContent.classList.add('hidden');
+            resultContent.classList.remove('pop-in');
+            
+            spinMsg.innerText = "May luck be with you...";
+            
+            // Reset Ticket to Default
+            updateTicketDisplay('Top Prize', '$100', 'Cash Voucher', 'Redeemable at Reception');
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            const flower = document.getElementById('plumeria-flower');
+            const btn = document.getElementById('flower-center-btn');
+            const spinMsg = document.getElementById('spin-msg');
+
+            // 1. Start Spin Animation
+            flower.classList.remove('flower-idle');
+            flower.classList.add('flower-spin');
+            
+            spinMsg.innerText = "Making a wish...";
+            
+            // Ticket suspense
+            updateTicketDisplay('Wishing...', '???', 'Spinning for luck', 'Good luck!');
+            
+            // Audio: Spin Tick
+            const spinInterval = setInterval(() => AudioEngine.playTick(), 200);
+
+            // Determine Prize beforehand
+            const rand = Math.random() * 100;
+            let prize = {};
+            let ticketData = {};
+
+            // Probability Logic
+            if (rand < 5.0) { // Increased slightly for demo purposes
+                prize = { name: '$100 Cash Voucher', icon: 'fa-money-bill-1-wave' };
+                ticketData = { title: 'CONGRATULATIONS!', main: '$100', desc: 'Cash Voucher', footer: 'Show this at reception!' };
+            } else if (rand < 20.0) {
+                prize = { name: 'Free Large Beer', icon: 'fa-beer-mug-empty' };
+                ticketData = { title: 'CHEERS!', main: 'FREE BEER', desc: 'Large Draft', footer: 'Redeem at Pool Bar' };
+            } else if (rand < 50.0) {
+                prize = { name: 'Free Snack', icon: 'fa-cookie-bite' };
+                ticketData = { title: 'YUMMY!', main: 'FREE SNACK', desc: 'Any item <$5', footer: 'Redeem at Cafe' };
+            } else {
+                prize = { name: '10% Off Coupon', icon: 'fa-tag' };
+                ticketData = { title: 'NICE!', main: '10% OFF', desc: 'Next Order', footer: 'Valid for food only' };
+            }
+
+            // 2. Wait 3 seconds
+            setTimeout(() => {
+                // Stop spin sound
+                clearInterval(spinInterval);
+                AudioEngine.playWin();
+
+                // 3. Stop Spin
+                flower.classList.remove('flower-spin');
+                flower.classList.add('flower-idle'); // Return to slow idle or just freeze? Let's idle.
+                
+                // 4. Center Pulse & Reveal
+                const idleContent = document.getElementById('flower-idle-content');
+                const resultContent = document.getElementById('flower-result-content');
+                const prizeIcon = document.getElementById('prize-icon-display');
+
+                idleContent.classList.add('hidden');
+                
+                // Set Icon
+                prizeIcon.className = `fa-solid ${prize.icon} text-4xl text-jungle`;
+                
+                // Show Result with Pop Animation
+                resultContent.classList.remove('hidden');
+                resultContent.classList.add('pop-in');
+                
+                // Add Pulse to the container
+                btn.classList.add('pulse-glow');
+                spinMsg.innerText = "Wish Granted!";
+                
+                // Update Ticket visually
+                updateTicketDisplay(ticketData.title, ticketData.main, ticketData.desc, ticketData.footer);
+
+                // --- CHANGED LOGIC: OPEN CLAIM FORM ---
+                openClaimForm({
+                    prizeTitle: prize.name,
+                    prizeDesc: new Date().toLocaleDateString(),
+                    prizeIcon: prize.icon,
+                    onSuccess: () => {
+                         showModal('Wish Granted!', prize.name, prize.icon);
+                    }
+                });
+
+            }, 3000); 
+        }
+
+        // --- GAME 2: POUR LOGIC ---
+        let pourInterval;
+        let pourStartTime;
+        let pourRunning = false;
+        
+        const pourTimerDisplay = document.getElementById('pour-timer');
+        const pourBtn = document.getElementById('pour-btn');
+        const pourBtnText = document.getElementById('pour-btn-text');
+        
+        const practiceDisplay = document.getElementById('pour-practice-display');
+
+        pourBtn.addEventListener('click', () => {
+            if (pourRunning) {
+                stopPour();
+            } else {
+                startPour();
+            }
+        });
+
+        function updatePracticeDisplay() {
+            if (document.getElementById('pour-practice-display')) {
+                 document.getElementById('pour-practice-display').innerText = `Practice Left: ${DB.getPourPractice()}`;
+            }
+        }
+        updatePracticeDisplay();
+
+        function updatePourTicket(subtitle, title, desc) {
+            document.getElementById('pour-ticket-subtitle').innerText = subtitle;
+            document.getElementById('pour-ticket-title').innerText = title;
+            document.getElementById('pour-ticket-desc').innerText = desc;
+        }
+
+        function resetPourGameUI() {
+            // Stop sound if any
+            AudioEngine.stopPourSound();
+
+            // Updated to set the initial Golden Ticket state
+            updatePourTicket('🎯 TARGET: 9.00s', 'FREE MEAL', 'Stop exactly at 9.00s - 9.05s');
+            updatePracticeDisplay();
+            
+            // Reset visuals
+            const liquid = document.getElementById('pour-liquid');
+            const foam = document.getElementById('pour-foam');
+            const bubbles = document.getElementById('pour-bubbles');
+            
+            if(liquid) {
+                liquid.style.height = '0%';
+                liquid.style.background = '';
+            }
+            if(foam) {
+                foam.style.bottom = '0%';
+                foam.style.opacity = '1';
+            }
+            if(bubbles) bubbles.innerHTML = '';
+            
+            pourTimerDisplay.classList.remove('blind-active');
+            pourTimerDisplay.innerText = "0.00";
+            
+            pourBtnText.innerText = "START";
+            pourBtn.classList.remove('bg-red-600', 'text-white');
+            pourBtn.classList.add('bg-jungle', 'text-plumeria');
+            pourRunning = false;
+            if(pourInterval) clearInterval(pourInterval);
+        }
+
+        function startPour() {
+            const practiceLeft = DB.getPourPractice();
+            if (practiceLeft > 0) {
+                 DB.decPourPractice();
+                 updatePracticeDisplay();
+            }
+            
+            // Start sound
+            AudioEngine.startPourSound();
+
+            // Update Card to show "Running" state
+            updatePourTicket('🍺 POURING...', '9.00s', 'Stop exactly at 9.00s!');
+
+            pourRunning = true;
+            pourBtnText.innerText = "STOP";
+            pourBtn.classList.remove('bg-jungle', 'text-plumeria');
+            pourBtn.classList.add('bg-red-600', 'text-white');
+            
+            pourTimerDisplay.classList.remove('blind-active');
+            pourTimerDisplay.innerText = "0.00";
+
+            // Reset Animation
+            const liquid = document.getElementById('pour-liquid');
+            const foam = document.getElementById('pour-foam');
+            const bubbles = document.getElementById('pour-bubbles');
+
+            liquid.style.height = '0%';
+            liquid.style.background = ''; // Reset color
+            foam.style.bottom = '0%';
+            foam.style.opacity = '1';
+            bubbles.innerHTML = '';
+
+            // Add Bubbles
+            for(let i=0; i<15; i++) {
+                const b = document.createElement('div');
+                b.className = 'bubble-rise';
+                b.style.left = Math.random() * 100 + '%';
+                b.style.width = (Math.random() * 6 + 4) + 'px';
+                b.style.height = b.style.width;
+                b.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+                b.style.animationDelay = Math.random() + 's';
+                b.style.bottom = (Math.random() * 50 - 50) + 'px';
+                bubbles.appendChild(b);
+            }
+            
+            pourStartTime = Date.now();
+            
+            pourInterval = setInterval(() => {
+                const elapsed = (Date.now() - pourStartTime) / 1000;
+                pourTimerDisplay.innerText = elapsed.toFixed(2);
+                
+                // Animate Liquid
+                // VISUAL TRICK: Fill visually at 4.00s (instead of target 9.00s) to increase difficulty
+                let percentage = (elapsed / 4.00) * 100;
+                if (percentage > 100) percentage = 100; // Cap visual at full
+                
+                liquid.style.height = `${percentage}%`;
+                foam.style.bottom = `${percentage}%`;
+                
+                // Visual feedback if exceeded
+                if (elapsed > 9.05) {
+                    liquid.style.background = '#EF4444'; // Red if failed
+                }
+
+                // Blind mode
+                if (elapsed > 5.0 && !pourTimerDisplay.classList.contains('blind-active')) {
+                    pourTimerDisplay.classList.add('blind-active');
+                }
+            }, 30); // update often
+        }
+
+        function stopPour() {
+            clearInterval(pourInterval);
+            pourRunning = false;
+            
+            // Stop sound
+            AudioEngine.stopPourSound();
+
+            pourBtnText.innerText = "AGAIN";
+            pourBtn.classList.remove('bg-red-600', 'text-white');
+            pourBtn.classList.add('bg-jungle', 'text-plumeria');
+            
+            pourTimerDisplay.classList.remove('blind-active');
+            
+            const finalTime = parseFloat(pourTimerDisplay.innerText);
+            
+            if (finalTime >= 9.00 && finalTime <= 9.05) {
+                AudioEngine.playWin();
+                updatePourTicket('🎉 WINNER!', 'FREE MEAL', `Perfect Time: ${finalTime}s`);
+                
+                // --- CHANGED LOGIC: OPEN CLAIM FORM ---
+                openClaimForm({
+                    prizeTitle: 'Free Meal Voucher',
+                    prizeDesc: `Perfect Pour: ${finalTime}s`,
+                    prizeIcon: 'fa-utensils',
+                    onSuccess: () => {
+                         showModal('INCREDIBLE!', 'You stopped perfectly! You win a FREE MEAL!', 'fa-utensils');
+                    }
+                });
+
+            } else if (finalTime >= 8.90 && finalTime <= 9.10) {
+                AudioEngine.playWin();
+                updatePourTicket('🥈 SO CLOSE!', '30% OFF', `Time: ${finalTime}s`);
+                
+                // --- CHANGED LOGIC: OPEN CLAIM FORM ---
+                openClaimForm({
+                    prizeTitle: '30% Off Voucher',
+                    prizeDesc: `Close Pour: ${finalTime}s`,
+                    prizeIcon: 'fa-tag',
+                    onSuccess: () => {
+                        showModal('So Close!', 'Great job! You win a 30% Off Coupon.', 'fa-tag');
+                    }
+                });
+
+            } else {
+                AudioEngine.playLose();
+                updatePourTicket('❌ OOPS!', 'TRY AGAIN', `Stopped at ${finalTime}s`);
+                showModal('Oof!', `You stopped at ${finalTime}s. Too bad! Buy a beer to relax.`, 'fa-face-sad-tear');
+            }
+        }
+
+        // --- GAME 3: ELEPHANT RACE LOGIC (IMMERSIVE REFACTOR) ---
+        const ELEPHANT_COLORS = {
+            red: { light: '#FFE4E6', main: '#FB7185', dark: '#E11D48', tailwind: 'text-rose-500' },
+            blue: { light: '#E0F2FE', main: '#38BDF8', dark: '#0284C7', tailwind: 'text-sky-500' },
+            yellow: { light: '#FEF3C7', main: '#FCD34D', dark: '#D97706', tailwind: 'text-amber-500' },
+            green: { light: '#D1FAE5', main: '#34D399', dark: '#059669', tailwind: 'text-emerald-500' }
+        };
+        
+        let userRacer = null;
+        let raceLoopId;
+        let racers = [];
+        let catchUpTriggered = false; 
+
+        // Constants
+        const BASE_SPEED = 0.085; 
+        
+        // Helper: Generate Bean-shaped Elephant SVG
+        function getElephantSVG(colorKey) {
+            const c = ELEPHANT_COLORS[colorKey];
+            return `
+            <svg class="w-full h-full" viewBox="0 0 100 100">
+                <path d="M30,70 L30,90 A5,5 0 0,0 40,90 L40,70 Z" fill="${c.dark}" />
+                <path d="M60,70 L60,90 A5,5 0 0,0 70,90 L70,70 Z" fill="${c.dark}" />
+                <path d="M20,60 C10,40 20,10 50,10 C80,10 90,40 80,60 C70,80 30,80 20,60 Z" fill="${c.main}" />
+                <circle cx="45" cy="40" r="15" fill="${c.light}" />
+                <circle cx="70" cy="35" r="3" fill="black" />
+                <path d="M75,50 Q80,55 85,50" stroke="black" stroke-width="2" fill="none" stroke-linecap="round" />
+                <path d="M80,45 Q95,45 95,25" stroke="${c.main}" stroke-width="8" fill="none" stroke-linecap="round" />
+            </svg>
+            `;
+        }
+
+        function initElephantGame() {
+            // Reset Views
+            document.getElementById('race-selection').classList.remove('hidden');
+            document.getElementById('race-track').classList.add('hidden');
+            document.getElementById('race-result').classList.add('hidden');
+            document.getElementById('confetti-container').innerHTML = '';
+            
+            // Render Previews
+            ['red', 'blue', 'yellow', 'green'].forEach(c => {
+                document.getElementById(`preview-${c}`).innerHTML = getElephantSVG(c);
+            });
+            
+            cancelAnimationFrame(raceLoopId);
+            userRacer = null;
+        }
+        
+        function selectElephant(color) {
+            userRacer = color;
+            document.getElementById('race-selection').classList.add('hidden');
+            document.getElementById('race-track').classList.remove('hidden');
+            startRace();
+        }
+        
+        function createParticles(type, count) {
+            const container = document.getElementById(`layer-${type}`);
+            container.innerHTML = '';
+            for(let i=0; i<count; i++) {
+                const p = document.createElement('div');
+                
+                if (type === 'clouds') {
+                    p.className = 'env-cloud';
+                    p.style.width = (50 + Math.random() * 50) + 'px';
+                    p.style.height = (20 + Math.random() * 20) + 'px';
+                    p.style.top = (Math.random() * 60) + '%';
+                    p.style.left = (Math.random() * 100) + '%';
+                    p.style.animationDuration = (8 + Math.random() * 5) + 's';
+                } else if (type === 'bubbles') {
+                    p.className = 'env-bubble';
+                    const size = (5 + Math.random() * 10) + 'px';
+                    p.style.width = size;
+                    p.style.height = size;
+                    p.style.left = (Math.random() * 100) + '%';
+                    p.style.animationDelay = (Math.random() * 2) + 's';
+                } else if (type === 'lines') {
+                    p.className = 'env-speed-line';
+                    p.style.width = (50 + Math.random() * 100) + 'px';
+                    p.style.top = (Math.random() * 100) + '%';
+                    p.style.left = (Math.random() * 100) + '%';
+                    p.style.animationDelay = (Math.random() * 0.5) + 's';
+                }
+                
+                container.appendChild(p);
+            }
+        }
+
+        function startRace() {
+            // Start Sound
+            AudioEngine.startRaceAmbience();
+
+            // Setup Racers
+            const keys = ['red', 'blue', 'yellow', 'green'];
+            catchUpTriggered = false;
+
+            racers = keys.map(k => ({
+                id: k,
+                pos: 0,
+                baseSpeed: BASE_SPEED + (Math.random() * 0.02),
+                currentSpeed: 0,
+                boost: 1.0,
+                finished: false
+            }));
+            
+            // Reset DOM elements
+            keys.forEach(k => {
+                const rEl = document.getElementById(`racer-${k}`);
+                rEl.innerHTML = getElephantSVG(k);
+                rEl.style.transform = `translateY(0)`;
+                rEl.className = "absolute left-0 bottom-1 w-16 h-16 pose-normal transition-transform";
+                rEl.style.left = "0%";
+            });
+            
+            // Setup Environments
+            createParticles('clouds', 5);
+            createParticles('bubbles', 15);
+            createParticles('lines', 8);
+
+            // Initial UI State
+            const trackBg = document.getElementById('race-track-bg');
+            const subText = document.getElementById('race-subtext');
+            const iconMeadow = document.getElementById('icon-meadow');
+            const iconRiver = document.getElementById('icon-river');
+            const iconSunset = document.getElementById('icon-sunset');
+            
+            // Layers
+            const lClouds = document.getElementById('layer-clouds');
+            const lBubbles = document.getElementById('layer-bubbles');
+            const lLines = document.getElementById('layer-lines');
+
+            let raceFinished = false;
+            
+            function loop() {
+                if (raceFinished) return;
+                
+                let anyoneFinished = false;
+                let winner = null;
+                
+                // Find Leader
+                let leader = racers.reduce((prev, current) => (prev.pos > current.pos) ? prev : current);
+                
+                // Update Ambience Pitch
+                AudioEngine.updateRaceAmbience(leader.pos / 100);
+
+                // --- STAGE LOGIC ---
+                // Reset active styles first
+                iconMeadow.className = "text-stone-300 transition-colors duration-500 text-xl";
+                iconRiver.className = "text-stone-300 transition-colors duration-500 text-xl";
+                iconSunset.className = "text-stone-300 transition-colors duration-500 text-xl";
+                
+                if (leader.pos < 40) {
+                    // STAGE A: SUNNY MEADOW
+                    trackBg.className = "bg-transition relative h-80 flex flex-col bg-gradient-to-b from-sky-300 to-green-300 overflow-hidden";
+                    subText.innerText = "STAGE 1: SUNNY MEADOW";
+                    subText.className = "font-bold text-green-600 font-mono tracking-widest text-sm transition-all duration-300";
+                    
+                    lClouds.style.opacity = 1;
+                    lBubbles.style.opacity = 0;
+                    lLines.style.opacity = 0;
+                    
+                    iconMeadow.className = "text-jungle scale-125 transition-colors duration-500 text-xl";
+                    document.getElementById('progress-fill').style.width = `${(leader.pos / 40) * 100}%`;
+                    document.getElementById('progress-fill-2').style.width = '0%';
+                    
+                } else if (leader.pos < 75) {
+                    // STAGE B: MYSTIC RIVER
+                    trackBg.className = "bg-transition relative h-80 flex flex-col bg-gradient-to-b from-blue-400 to-indigo-500 overflow-hidden";
+                    subText.innerText = "STAGE 2: MYSTIC RIVER";
+                    subText.className = "font-bold text-blue-600 font-mono tracking-widest text-sm transition-all duration-300";
+                    
+                    lClouds.style.opacity = 0;
+                    lBubbles.style.opacity = 1;
+                    lLines.style.opacity = 0;
+                    
+                    iconRiver.className = "text-blue-500 scale-125 transition-colors duration-500 text-xl";
+                    document.getElementById('progress-fill').style.width = '100%';
+                    document.getElementById('progress-fill-2').style.width = `${((leader.pos - 40) / 35) * 100}%`;
+
+                } else {
+                    // STAGE C: TURBO SUNSET
+                    trackBg.className = "bg-transition relative h-80 flex flex-col bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 overflow-hidden";
+                    subText.innerText = "STAGE 3: TURBO SPRINT";
+                    subText.className = "font-bold text-orange-600 font-mono tracking-widest text-sm transition-all duration-300";
+
+                    lClouds.style.opacity = 0;
+                    lBubbles.style.opacity = 0;
+                    lLines.style.opacity = 1;
+                    
+                    iconSunset.className = "text-orange-500 scale-125 transition-colors duration-500 text-xl";
+                    document.getElementById('progress-fill').style.width = '100%';
+                    document.getElementById('progress-fill-2').style.width = '100%';
+                }
+
+                // Catch-up Drama
+                if (leader.pos > 70 && !catchUpTriggered) {
+                    catchUpTriggered = true;
+                    let loser = racers.reduce((prev, current) => (prev.pos < current.pos) ? prev : current);
+                    loser.boost = 1.4; 
+                    racers.forEach(r => { if(r !== leader && r !== loser) r.boost = 1.15; });
+                }
+
+                // Physics Loop
+                racers.forEach(r => {
+                    let stageMod = 1.0;
+                    let poseClass = "pose-normal";
+
+                    // Determine individual physics based on OWN position
+                    if (r.pos < 40) {
+                        stageMod = 1.0;
+                        poseClass = "pose-normal";
+                    } else if (r.pos < 75) {
+                        stageMod = 0.55; // Slow water
+                        poseClass = "pose-struggle";
+                    } else {
+                        stageMod = 1.6; // Sprint
+                        poseClass = "pose-sprint";
+                    }
+
+                    r.currentSpeed = r.baseSpeed * stageMod * r.boost;
+                    if (Math.random() < 0.1) r.currentSpeed *= 1.1; 
+
+                    r.pos += r.currentSpeed;
+                    
+                    const rEl = document.getElementById(`racer-${r.id}`);
+                    rEl.style.left = `${Math.min(r.pos, 90)}%`; // Cap visual at 90% inside container
+                    rEl.className = `absolute bottom-1 w-16 h-16 transition-transform ${poseClass}`;
+                    
+                    if (r.pos >= 90 && !anyoneFinished) {
+                        anyoneFinished = true;
+                        winner = r.id;
+                    }
+                });
+                
+                if (anyoneFinished) {
+                    raceFinished = true;
+                    endRace(winner);
+                } else {
+                    raceLoopId = requestAnimationFrame(loop);
+                }
+            }
+            
+            raceLoopId = requestAnimationFrame(loop);
+        }
+        
+        function endRace(winner) {
+            AudioEngine.stopRaceAmbience();
+
+            // Stop animations
+            ['red', 'blue', 'yellow', 'green'].forEach(k => {
+                document.getElementById(`racer-${k}`).style.animation = 'none';
+            });
+            
+            setTimeout(() => {
+                const overlay = document.getElementById('race-result');
+                const title = document.getElementById('result-title');
+                const msg = document.getElementById('result-msg');
+                const bg = document.getElementById('result-icon-bg');
+                const icon = document.getElementById('result-icon');
+                const prizeIcon = document.getElementById('prize-icon');
+                const prizeName = document.getElementById('prize-name');
+                const winnerVisual = document.getElementById('winner-visual');
+                const winnerSvgTarget = document.getElementById('winner-svg-target');
+                
+                // Display Winner Visual (Golden Medal)
+                winnerVisual.classList.remove('hidden');
+                winnerSvgTarget.innerHTML = getElephantSVG(winner);
+                
+                if (winner === userRacer) {
+                    AudioEngine.playWin();
+                    startConfetti();
+                    
+                    bg.className = "w-24 h-24 mx-auto rounded-full flex items-center justify-center -mt-16 mb-4 shadow-lg border-4 border-white bg-jungle";
+                    icon.className = "text-4xl text-white fa-solid fa-trophy";
+                    title.innerText = "YAY! YOU WON!";
+                    title.className = "text-3xl font-black text-jungle mb-2 uppercase";
+                    msg.innerText = "Incredible racing! Here is your prize.";
+                    prizeIcon.className = "text-2xl text-jungle fa-solid fa-gift";
+                    prizeName.innerText = "Family Set";
+
+                    // --- CHANGED LOGIC: SKIP CLAIM FORM (Children Game) ---
+                    DB.addToWallet({
+                        title: 'Family Set',
+                        desc: 'Elephant Race Winner',
+                        icon: 'fa-gift'
+                    });
+                    overlay.classList.remove('hidden');
+
+                } else {
+                    AudioEngine.playLose();
+                    bg.className = "w-24 h-24 mx-auto rounded-full flex items-center justify-center -mt-16 mb-4 shadow-lg border-4 border-white bg-amber-400";
+                    icon.className = "text-4xl text-white fa-solid fa-medal";
+                    title.innerText = "Good Race!";
+                    title.className = "text-3xl font-black text-amber-500 mb-2 uppercase";
+                    msg.innerText = `Winner was ${winner.toUpperCase()}. You get a treat!`;
+                    prizeIcon.className = "text-2xl text-amber-500 fa-solid fa-candy-cane";
+                    prizeName.innerText = "Sweet Treat";
+                    
+                    // --- CHANGED LOGIC: SKIP CLAIM FORM (Children Game) ---
+                    DB.addToWallet({
+                        title: 'Sweet Treat',
+                        desc: 'Elephant Race Runner-up',
+                        icon: 'fa-candy-cane'
+                    });
+                    overlay.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+        
+        function startConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#f43f5e', '#0ea5e9', '#eab308', '#10b981'];
+            for (let i = 0; i < 50; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti-piece';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animation = `drop ${1 + Math.random()}s linear forwards`;
+                let y = -10;
+                let x = parseFloat(conf.style.left);
+                let speedY = 2 + Math.random() * 3;
+                let wobble = Math.random() * 2;
+                container.appendChild(conf);
+                const animateConfetti = () => {
+                    y += speedY;
+                    x += Math.sin(y * 0.1) * wobble;
+                    conf.style.top = y + 'px';
+                    conf.style.left = x + '%';
+                    conf.style.transform = `rotate(${y * 5}deg)`;
+                    if (y < window.innerHeight) {
+                        requestAnimationFrame(animateConfetti);
+                    } else {
+                        conf.remove();
+                    }
+                };
+                requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        // --- WALLET LOGIC ---
+        function renderWallet() {
+            const list = document.getElementById('wallet-list');
+            const empty = document.getElementById('wallet-empty');
+            const items = DB.getWallet();
+            
+            list.innerHTML = '';
+            
+            if (items.length === 0) {
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                items.forEach((item, index) => {
+                    const el = document.createElement('div');
+                    el.className = 'bg-white p-4 rounded-xl shadow-sm border border-stone-200 flex justify-between items-center relative overflow-hidden cursor-pointer transition hover:shadow-md';
+                    el.setAttribute('onclick', `showItemDetails(${index})`);
+                    
+                    // Add Registered Badge if applicable
+                    let badgeHtml = '';
+                    if (item.registered) {
+                        badgeHtml = `<div class="absolute -top-1 -right-8 bg-jungle text-white text-[10px] font-bold px-8 py-1 rotate-45 shadow-sm">Registered</div>`;
+                    }
+
+                    el.innerHTML = `
+                        ${badgeHtml}
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-jungle/10 text-jungle rounded-full flex items-center justify-center">
+                                <i class="fa-solid ${item.icon || 'fa-gift'}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-stone-800">${item.title}</h4>
+                                <p class="text-xs text-stone-500">${item.desc}</p>
+                            </div>
+                        </div>
+                        <button onclick="event.stopPropagation(); redeemItem('${index}')" class="${item.redeemed ? 'bg-stone-300 text-stone-500' : 'bg-plumeria text-jungle'} px-3 py-1 rounded-lg text-xs font-bold shadow-sm" ${item.redeemed ? 'disabled' : ''}>
+                            ${item.redeemed ? 'USED' : 'USE'}
+                        </button>
+                    `;
+                    list.appendChild(el);
+                });
+            }
+        }
+
+        function showItemDetails(index) {
+            const wallet = DB.getWallet();
+            const item = wallet[index];
+            
+            // Fallback for legacy items or items without registration
+            const name = item.customerName || 'Not Recorded';
+            const phone = item.customerPhone || 'Not Recorded';
+            const time = item.winTime || item.desc;
+
+            document.getElementById('detail-prize').innerText = item.title;
+            document.getElementById('detail-name').innerText = name;
+            document.getElementById('detail-phone').innerText = phone;
+            document.getElementById('detail-time').innerText = time;
+            
+            document.getElementById('details-modal').classList.remove('hidden');
+        }
+
+        function redeemItem(index) {
+            const wallet = DB.getWallet();
+            if (confirm(`Redeem "${wallet[index].title}"? Staff will verify this.`)) {
+                wallet[index].redeemed = true;
+                localStorage.setItem('manyo_wallet', JSON.stringify(wallet));
+                renderWallet();
+            }
+        }
+
+        // Init
+        console.log("Manyo Hotel App Loaded");
+    </script>
+</body>
+</html>
